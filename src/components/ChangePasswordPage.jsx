@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
-import { Box, Button, Paper, Typography, Grid } from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
+import { Box, Button, Paper, Typography, Grid } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import {
   useGraphqlMutation,
   useTranslations,
@@ -9,14 +9,19 @@ import {
   useAuthentication,
 } from "@openimis/fe-core";
 
-const useStyles = makeStyles((theme) => ({
-  page: theme.page,
-  paper: theme.paper.paper,
-  title: theme.paper.title,
+const StyledPage = styled(Box)(({ theme }) => ({
+  ...theme.page,
+}));
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  ...theme.paper.paper,
+}));
+
+const StyledTitle = styled(Typography)(({ theme }) => ({
+  ...theme.paper.title,
 }));
 
 const ChangePasswordPage = (props) => {
-  const classes = useStyles();
   const modulesManager = useModulesManager();
   const { formatMessage } = useTranslations("profile.ChangePasswordPage", modulesManager);
   const [formValues, setFormValues] = useState({});
@@ -54,11 +59,11 @@ const ChangePasswordPage = (props) => {
   };
 
   return (
-    <Box className={classes.page}>
-      <Paper className={classes.paper}>
-        <Typography className={classes.title} variant="h6">
+    <StyledPage>
+      <StyledPaper>
+        <StyledTitle variant="h6">
           {formatMessage("title")}
-        </Typography>
+        </StyledTitle>
         <Box padding="10px">
           <form onSubmit={onSubmit}>
             <Grid container spacing={2}>
@@ -110,8 +115,8 @@ const ChangePasswordPage = (props) => {
             </Grid>
           </form>
         </Box>
-      </Paper>
-    </Box>
+      </StyledPaper>
+    </StyledPage>
   );
 };
 

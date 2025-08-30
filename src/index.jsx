@@ -1,5 +1,5 @@
 import React from 'react';
-import { Fingerprint, InsertEmoticon } from "@material-ui/icons";
+import { Fingerprint, InsertEmoticon } from "@mui/icons-material";
 import { FormattedMessage } from '@openimis/fe-core';
 import ProfileToolbarContribution from "./components/ProfileToolbarContribution";
 import ProfileMainMenu from "./components/ProfileMainMenu";
