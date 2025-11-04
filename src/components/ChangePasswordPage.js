@@ -62,7 +62,7 @@ const ChangePasswordPage = (props) => {
         <Box padding="10px">
           <form onSubmit={onSubmit}>
             <Grid container spacing={2}>
-              <Grid xs={4} item>
+              <Grid xs={12} item>
                 <TextInput
                   module="profile"
                   required
@@ -72,7 +72,7 @@ const ChangePasswordPage = (props) => {
                   onChange={(oldPassword) => setFormValues({ ...formValues, oldPassword })}
                 />
               </Grid>
-              <Grid xs={4} item>
+              <Grid xs={12} item>
                 <TextInput
                   module="profile"
                   required
@@ -82,7 +82,7 @@ const ChangePasswordPage = (props) => {
                   onChange={(password) => setFormValues({ ...formValues, password })}
                 />
               </Grid>
-              <Grid xs={4} item>
+              <Grid xs={12} item>
                 <TextInput
                   module="profile"
                   readOnly={isLoading}
