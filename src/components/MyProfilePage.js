@@ -1,15 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Paper,
   Typography,
   Grid,
-  TableContainer,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
+  Button,
+  Select,MenuItem,
+  FormControl, InputLabel
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import {
@@ -19,10 +16,10 @@ import {
   FormattedMessage,
   ProgressOrError,
   ControlledField,
+  SelectInput
 } from "@openimis/fe-core";
-
 import { useDispatch, useSelector } from "react-redux";
-import { fetchRoles } from "../action.js";
+import { fetchRoles, updateUserProfile } from "../action.js"; // 👈 add updateUserProfile action
 
 const useStyles = makeStyles((theme) => ({
   page: theme.page,
@@ -33,59 +30,72 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const MyProfilePage = (props) => {
+const MyProfilePage = () => {
   const classes = useStyles();
   const modulesManager = useModulesManager();
-  const { formatMessage } = useTranslations(
-    "profile.MyProfilePage",
-    modulesManager
-  );
+  const { formatMessage } = useTranslations("profile.MyProfilePage", modulesManager);
 
   const dispatch = useDispatch();
   const fetchingUser = useSelector((store) => store.profile.fetchingUser);
   const errorUser = useSelector((store) => store.profile.errorUser);
   const user = useSelector((store) => store.profile.user);
 
-  let regions = [];
-  let districts = [];
-  const locations = user?.iUser?.userdistrictSet;
+  const [formData, setFormData] = useState({
+    userName: "",
+    otherNames: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    language: "",
+  });
 
-  if (locations) {
-    locations.map((location) => {
-      if (!!location.location.parent && !districts.includes(location.location)) {
-        districts.push(location.location.name);
-      }
-      if (!!location.location.parent && !regions.includes(location.location.parent.name)) {
-        regions.push(location.location.parent.name);
-      }
-    });
-  }
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        userName: user?.username || "",
+        otherNames: user?.otherNames || "",
+        lastName: user?.lastName || "",
+        email: user?.email || "",
+        phone: user?.phone || "",
+        language: user?.iUser?.language?.name==="বাংলা"?"fr":"en" || "",
+      });
+      console.log("User data loaded:", user);
+    }
+  }, [user]);
 
   useEffect(() => {
     dispatch(fetchRoles());
   }, []);
 
+  const handleChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const saveProfile = () => {
+    dispatch(updateUserProfile(formData));
+  };
+
   return (
     <Box className={classes.page}>
       <Paper className={classes.paper}>
         <Typography className={classes.title} variant="h6">
-          {formatMessage("title")}
+          {formatMessage("editTitle")}
         </Typography>
         <Box padding="10px">
           <ProgressOrError progress={fetchingUser} error={errorUser} />
-          <Grid container spacing={2}>
+           <Grid container spacing={2}>
             <ControlledField
               module="profile"
               id="userName"
               field={
-                <Grid item xs={4} className={classes.item}>
+                <Grid item xs={4}>
                   <TextInput
                     module="profile"
                     label="userName"
                     name="userName"
-                    value={user?.username}
+                    value={formData.userName}
+                    onChange={(v) => handleChange("userName", v)}
                     variant="outlined"
-                    readOnly={true}
                   />
                 </Grid>
               }
@@ -95,14 +105,14 @@ const MyProfilePage = (props) => {
               module="profile"
               id="otherNames"
               field={
-                <Grid item xs={4} className={classes.item}>
+                <Grid item xs={4}>
                   <TextInput
                     module="profile"
                     label="otherNames"
                     name="otherNames"
-                    value={user?.otherNames}
+                    value={formData.otherNames}
+                    onChange={(v) => handleChange("otherNames", v)}
                     variant="outlined"
-                    readOnly={true}
                   />
                 </Grid>
               }
@@ -110,16 +120,16 @@ const MyProfilePage = (props) => {
 
             <ControlledField
               module="profile"
-              id="LastName"
+              id="lastName"
               field={
-                <Grid item xs={4} className={classes.item}>
+                <Grid item xs={4}>
                   <TextInput
                     module="profile"
                     label="lastName"
                     name="lastName"
-                    value={user?.lastName}
+                    value={formData.lastName}
+                    onChange={(v) => handleChange("lastName", v)}
                     variant="outlined"
-                    readOnly={true}
                   />
                 </Grid>
               }
@@ -129,14 +139,14 @@ const MyProfilePage = (props) => {
               module="profile"
               id="email"
               field={
-                <Grid item xs={4} className={classes.item}>
+                <Grid item xs={4}>
                   <TextInput
                     module="profile"
                     label="email"
                     name="email"
-                    value={user?.email}
+                    value={formData.email}
+                    onChange={(v) => handleChange("email", v)}
                     variant="outlined"
-                    readOnly={true}
                   />
                 </Grid>
               }
@@ -146,37 +156,66 @@ const MyProfilePage = (props) => {
               module="profile"
               id="phone"
               field={
-                <Grid item xs={4} className={classes.item}>
+                <Grid item xs={4}>
                   <TextInput
                     module="profile"
                     label="phone"
                     name="phone"
-                    value={user?.phone}
+                    value={formData.phone}
+                    onChange={(v) => handleChange("phone", v)}
                     variant="outlined"
-                    readOnly={true}
-                  />
-                </Grid>
-              }
-            />
-
-            <ControlledField
-              module="profile"
-              id="language"
-              field={
-                <Grid item xs={4} className={classes.item}>
-                  <TextInput
-                    module="profile"
-                    label="language"
-                    name="language"
-                    value={user?.iUser?.language?.name}
-                    variant="outlined"
-                    readOnly={true}
                   />
                 </Grid>
               }
             />
 
             <Grid item xs={4}>
+              <FormControl fullWidth>
+                  <InputLabel id="language">{formatMessage("profile.language")}</InputLabel>
+                  <Select
+                    module="profile"
+                    labelId="language"
+                    value={formData.language}
+                    label="language"
+                    name="language"
+                    variant="outlined"
+                    onChange={(e) => handleChange("language", e.target.value)}
+                  >
+                    <MenuItem value="en">English</MenuItem>
+                    <MenuItem value="fr">বাংলা</MenuItem>
+                  </Select>
+              </FormControl>
+            </Grid>
+          {/* 
+            <ControlledField
+              module="profile"
+              id="language"
+              field={
+                <Grid item xs={4}>
+                  <TextInput
+                    module="profile"
+                    label="language"
+                    name="language"
+                    value={formData.language}
+                    onChange={(v) => handleChange("language", v)}
+                    variant="outlined"
+                  />
+                </Grid>
+              }
+            /> */}
+
+            <Grid item xs={4}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={saveProfile}
+              >
+                <FormattedMessage module="profile" id="saveProfile" />
+              </Button>
+            </Grid>
+
+
+            {/* <Grid item xs={4}>
               <TableContainer component={Paper} className={classes.container}>
                 <Table stickyHeader size="small" arial-label="Assigned Roles">
                   <TableHead>
@@ -203,8 +242,8 @@ const MyProfilePage = (props) => {
                   </TableBody>
                 </Table>
               </TableContainer>
-            </Grid>
-            <Grid item xs={4}>
+            </Grid> */}
+            {/* <Grid item xs={4}>
               <TableContainer component={Paper} className={classes.container}>
                 <Table stickyHeader size="small" arial-label="Assigned Regions">
                   <TableHead>
@@ -231,8 +270,8 @@ const MyProfilePage = (props) => {
                   </TableBody>
                 </Table>
               </TableContainer>
-            </Grid>
-            <Grid item xs={4}>
+            </Grid> */}
+            {/* <Grid item xs={4}>
               <TableContainer component={Paper} className={classes.container}>
                 <Table
                   stickyHeader
@@ -263,7 +302,7 @@ const MyProfilePage = (props) => {
                   </TableBody>
                 </Table>
               </TableContainer>
-            </Grid>
+            </Grid> */}
           </Grid>
         </Box>
       </Paper>

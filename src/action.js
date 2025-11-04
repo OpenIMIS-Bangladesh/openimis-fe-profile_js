@@ -12,3 +12,9 @@ export function fetchRoles(params) {
   const payload = formatQuery("user", params, ROLE_FULL_PROJECTION());
   return graphql(payload, "PROFILE_ROLES");
 }
+
+
+export function updateUserProfile(params) {
+  const payload = formatQuery("user", params, ROLE_FULL_PROJECTION());
+  return graphql(payload, "PROFILE_ROLES");
+}
