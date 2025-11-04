@@ -39,6 +39,8 @@ const MyProfilePage = () => {
   const fetchingUser = useSelector((store) => store.profile.fetchingUser);
   const errorUser = useSelector((store) => store.profile.errorUser);
   const user = useSelector((store) => store.profile.user);
+  const reduxStateUserInfo = useSelector((state) => state.core.user.i_user);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
     userName: "",
@@ -52,14 +54,14 @@ const MyProfilePage = () => {
   useEffect(() => {
     if (user) {
       setFormData({
+        id: reduxStateUserInfo?.id || "",
         userName: user?.username || "",
         otherNames: user?.otherNames || "",
         lastName: user?.lastName || "",
         email: user?.email || "",
         phone: user?.phone || "",
-        language: user?.iUser?.language?.name==="বাংলা"?"fr":"en" || "",
+        // language: user?.iUser?.language?.name==="বাংলা"?"fr":"en" || "",
       });
-      console.log("User data loaded:", user);
     }
   }, [user]);
 
@@ -73,6 +75,11 @@ const MyProfilePage = () => {
 
   const saveProfile = () => {
     dispatch(updateUserProfile(formData));
+    setShowSuccess(true);
+
+    setTimeout(() => {
+      setShowSuccess(false);
+    }, 3000);
   };
 
   return (
@@ -84,18 +91,27 @@ const MyProfilePage = () => {
         <Box padding="10px">
           <ProgressOrError progress={fetchingUser} error={errorUser} />
            <Grid container spacing={2}>
+            {showSuccess && (
+            <Grid item xs={12}>
+              <Paper style={{ padding: "20px", marginBottom: "10px" }} variant="outlined">
+                <Typography variant="h6" style={{ fontWeight: "bold", color: "#3fb55dff" }}>
+                  <FormattedMessage module="profile" id="updated.successfully" />
+                </Typography>
+              </Paper>
+            </Grid>
+            )}
             <ControlledField
               module="profile"
               id="userName"
               field={
-                <Grid item xs={4}>
+                <Grid item xs={4} className={classes.item}>
                   <TextInput
                     module="profile"
                     label="userName"
                     name="userName"
-                    value={formData.userName}
-                    onChange={(v) => handleChange("userName", v)}
+                    value={user?.username}
                     variant="outlined"
+                    readOnly={true}
                   />
                 </Grid>
               }
@@ -169,7 +185,7 @@ const MyProfilePage = () => {
               }
             />
 
-            <Grid item xs={4}>
+            {/* <Grid item xs={4}>
               <FormControl fullWidth>
                   <InputLabel id="language">{formatMessage("profile.language")}</InputLabel>
                   <Select
@@ -185,7 +201,7 @@ const MyProfilePage = () => {
                     <MenuItem value="fr">বাংলা</MenuItem>
                   </Select>
               </FormControl>
-            </Grid>
+            </Grid> */}
           {/* 
             <ControlledField
               module="profile"
@@ -204,7 +220,7 @@ const MyProfilePage = () => {
               }
             /> */}
 
-            <Grid item xs={4}>
+            <Grid item xs={12}>
               <Button
                 variant="contained"
                 color="primary"

@@ -6,6 +6,15 @@ export function reducer(
     fetchedUser: null,
     user: null,
     errorUser: null,
+
+
+    
+
+
+    //update profile states
+    updatingProfile: false,
+    errorUpdatingProfile: null,
+    updatedProfile: false
   },
   action
 ) {
@@ -31,6 +40,25 @@ export function reducer(
         ...state,
         fetchingUser: false,
         errorUser: formatServerError(action.payload),
+      };
+      
+    case "PROFILE_UPDATE_REQ":
+      return {
+        ...state,
+        updatingProfile: true,
+        errorUpdatingProfile: null,
+      };
+    case "PROFILE_UPDATE_RESP":
+      return {
+        ...state,
+        updatedProfile: true,
+        errorUpdatingProfile: null,
+      };
+    case "PROFILE_UPDATE_ERR":
+      return {
+        ...state,
+        updatedProfile: false,
+        errorUpdatingProfile: null,
       };
 
     default:

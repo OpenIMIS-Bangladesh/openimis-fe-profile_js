@@ -8,7 +8,9 @@
   "profile.ChangePasswordPage.confirmPasswordLabel": "Confirm New Password",
   "profile.ChangePasswordPage.submitButton": "Submit",
   "profile.menu.myProfile": "My Profile",
+  "profile.menu.dashboard": "Dashboard",
   "profile.MyProfilePage.title": "My Profile",
+  "profile.MyProfilePage.editTitle": "Edit Profile Information",
   "profile.roles": "Assigned Roles",
   "profile.regions": "Assigned Regions",
   "profile.districts": "Assigned Districts",
@@ -17,5 +19,8 @@
   "profile.lastName": "Last Name",
   "profile.email": "Email",
   "profile.phone": "Phone Number",
-  "profile.language": "Interface Language"
+  "profile.language": "Interface Language",
+  "profile.fullname": "Full Name",
+  "profile.saveProfile": "Save Information",
+  "profile.updated.successfully": "Information updated successfully"
 }
