@@ -206,15 +206,28 @@ const MyProfile =() =>{
               </div>
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={3}>
               <div className={classes.infoItem}>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <AccountBox color="primary" />
                 </Box>
                 <Box>
-                  <Typography className={classes.infoLabel}>{formatMessage("profile.fullname")}</Typography>
+                  <Typography className={classes.infoLabel}>{formatMessage("profile.otherNames")}</Typography>
                   <Typography variant="h6">
-                    {user?.otherNames} {user?.lastName}
+                    {user?.otherNames}
+                  </Typography>
+                </Box>
+              </div>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <div className={classes.infoItem}>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <AccountBox color="primary" />
+                </Box>
+                <Box>
+                  <Typography className={classes.infoLabel}>{formatMessage("profile.lastName")}</Typography>
+                  <Typography variant="h6">
+                    {user?.lastName}
                   </Typography>
                 </Box>
               </div>
