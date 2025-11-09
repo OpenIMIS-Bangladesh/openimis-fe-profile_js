@@ -12,6 +12,7 @@
   "profile.MyProfilePage.title": "My Profile",
   "profile.MyProfilePage.editTitle": "Edit Profile Information",
   "profile.roles": "Assigned Roles",
+  "profile.role": "Role",
   "profile.regions": "Assigned Regions",
   "profile.districts": "Assigned Districts",
   "profile.userName": "Username",
