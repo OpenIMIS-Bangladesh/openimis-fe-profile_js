@@ -5,8 +5,10 @@ import {
   Typography,
   Grid,
   Button,
-  Select,MenuItem,
-  FormControl, InputLabel
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import {
@@ -16,10 +18,18 @@ import {
   FormattedMessage,
   ProgressOrError,
   ControlledField,
-  SelectInput
+  SelectInput,
+  encodeId
 } from "@openimis/fe-core";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchRoles, updateUserProfile } from "../action.js"; // 👈 add updateUserProfile action
+import {
+  createWorkforceDocument,
+  fetchRoles,
+  fetchWorkforceDocument,
+  updateUserProfile,
+} from "../action.js"; // 👈 add updateUserProfile action
+import SignatureCapture from "./shared/SignatureCapture.js";
+import { safeApplicationId } from "../utils/utils.js";
 
 const useStyles = makeStyles((theme) => ({
   page: theme.page,
@@ -33,7 +43,10 @@ const useStyles = makeStyles((theme) => ({
 const MyProfilePage = () => {
   const classes = useStyles();
   const modulesManager = useModulesManager();
-  const { formatMessage } = useTranslations("profile.MyProfilePage", modulesManager);
+  const { formatMessage } = useTranslations(
+    "profile.MyProfilePage",
+    modulesManager
+  );
 
   const dispatch = useDispatch();
   const fetchingUser = useSelector((store) => store.profile.fetchingUser);
@@ -41,6 +54,7 @@ const MyProfilePage = () => {
   const user = useSelector((store) => store.profile.user);
   const reduxStateUserInfo = useSelector((state) => state.core.user.i_user);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [signatureFiles, setSignatureFiles] = useState([]);
 
   const [formData, setFormData] = useState({
     userName: "",
@@ -67,20 +81,36 @@ const MyProfilePage = () => {
 
   useEffect(() => {
     dispatch(fetchRoles());
+    dispatch(fetchWorkforceDocument(modulesManager, [`holderId:"${encodeId(modulesManager, "InteractiveUserGQLType", reduxStateUserInfo?.id)}"`]))
   }, []);
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const saveProfile = () => {
+  const saveProfile = async () => {
     dispatch(updateUserProfile(formData));
+    
+    const createDocumentData = {
+        path: signatureFiles?.[0]?.uploadInfo?.file_path,
+        url: signatureFiles?.[0]?.uploadInfo?.file_url,
+        // workforceApplicationId: safeApplicationId(applicationId),
+        documentType: "signature",
+        holder: "57",
+        holderId: reduxStateUserInfo?.id,
+        holderType: "user",
+      };
+      console.log("inside from saveprofile", createDocumentData);
+      dispatch(createWorkforceDocument(createDocumentData,`Created workforce document `));
     setShowSuccess(true);
 
     setTimeout(() => {
       setShowSuccess(false);
     }, 3000);
   };
+
+  // console.log("upload from profile", uploadFile);
+  console.log("upload from profile", signatureFiles);
 
   return (
     <Box className={classes.page}>
@@ -90,15 +120,24 @@ const MyProfilePage = () => {
         </Typography>
         <Box padding="10px">
           <ProgressOrError progress={fetchingUser} error={errorUser} />
-           <Grid container spacing={2}>
+          <Grid container spacing={2}>
             {showSuccess && (
-            <Grid item xs={12}>
-              <Paper style={{ padding: "20px", marginBottom: "10px" }} variant="outlined">
-                <Typography variant="h6" style={{ fontWeight: "bold", color: "#3fb55dff" }}>
-                  <FormattedMessage module="profile" id="updated.successfully" />
-                </Typography>
-              </Paper>
-            </Grid>
+              <Grid item xs={12}>
+                <Paper
+                  style={{ padding: "20px", marginBottom: "10px" }}
+                  variant="outlined"
+                >
+                  <Typography
+                    variant="h6"
+                    style={{ fontWeight: "bold", color: "#3fb55dff" }}
+                  >
+                    <FormattedMessage
+                      module="profile"
+                      id="updated.successfully"
+                    />
+                  </Typography>
+                </Paper>
+              </Grid>
             )}
             <ControlledField
               module="profile"
@@ -202,7 +241,7 @@ const MyProfilePage = () => {
                   </Select>
               </FormControl>
             </Grid> */}
-          {/* 
+            {/* 
             <ControlledField
               module="profile"
               id="language"
@@ -219,17 +258,23 @@ const MyProfilePage = () => {
                 </Grid>
               }
             /> */}
+            <Grid item xs={12}>
+              <SignatureCapture
+                fieldKey="signature"
+                documentType="signature"
+                documentProp={{ id: "12345" }}
+                // applicationId={applicationId}
+                dispatch={dispatch}
+                files={signatureFiles}
+                setFiles={setSignatureFiles}
+              />
+            </Grid>
 
             <Grid item xs={12}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={saveProfile}
-              >
+              <Button variant="contained" color="primary" onClick={saveProfile}>
                 <FormattedMessage module="profile" id="saveProfile" />
               </Button>
             </Grid>
-
 
             {/* <Grid item xs={4}>
               <TableContainer component={Paper} className={classes.container}>

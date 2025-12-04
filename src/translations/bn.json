@@ -23,5 +23,7 @@
   "profile.language": "সিস্টেমের ভাষা",
   "profile.fullname": "পূর্ণ নাম",
   "profile.saveProfile": "তথ্য সংরক্ষণ করুন",
-  "profile.updated.successfully": "তথ্য সফলভাবে আপডেট হয়েছে"
+  "profile.updated.successfully": "তথ্য সফলভাবে আপডেট হয়েছে",
+  "workforce.profile.uploadSignature":"স্বাক্ষর আপলোড করুন"
+
 }

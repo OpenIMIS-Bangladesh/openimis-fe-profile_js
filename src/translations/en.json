@@ -23,5 +23,6 @@
   "profile.language": "Interface Language",
   "profile.fullname": "Full Name",
   "profile.saveProfile": "Save Information",
-  "profile.updated.successfully": "Information updated successfully"
+  "profile.updated.successfully": "Information updated successfully",
+  "workforce.profile.uploadSignature":"Upload Signature"
 }
