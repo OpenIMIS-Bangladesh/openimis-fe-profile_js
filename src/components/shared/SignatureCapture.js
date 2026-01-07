@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SignatureCapture = ({ files, setFiles }) => {
+const SignatureCapture = ({ files, setFiles,handleDelete }) => {
   const classes = useStyles();
   const [image, setImage] = useState(null);
   const [showCropper, setShowCropper] = useState(false);
@@ -164,7 +164,10 @@ const SignatureCapture = ({ files, setFiles }) => {
     setImage(null);
   };
 
-  const handleRemove = () => setFiles([]);
+  const handleRemove = (file) => {
+    setFiles([]);
+    handleDelete(file)
+  }
   const handleView = (file) => window.open(file.url, "_blank");
 
   console.log(files)
@@ -210,7 +213,7 @@ const SignatureCapture = ({ files, setFiles }) => {
               >
                 {file.name ||"Signature.png"}
               </Typography>
-              <IconButton size="small" onClick={handleRemove}>
+              <IconButton size="small" onClick={()=>handleRemove(file)}>
                 <DeleteIcon className={classes.deleteIcon} />
               </IconButton>
             </Box>

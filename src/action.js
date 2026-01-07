@@ -83,6 +83,7 @@ export function formatWorkforceDocumentGQL(workforceDocumentType) {
     ${workforceDocumentType?.workforceDocumentTypeId ? `workforceDocumentTypeId: "${workforceDocumentType?.workforceDocumentTypeId}"` : ""}
     ${workforceDocumentType?.path ? `path: "${workforceDocumentType?.path}"` : ""}
     ${workforceDocumentType?.url ? `url: "${workforceDocumentType?.url}"` : ""}
+    ${workforceDocumentType?.isDeleted ? `isDeleted: ${workforceDocumentType?.isDeleted}` : ""}
 
     ${workforceDocumentType?.documentType ? `documentType: "${formatGQLString(workforceDocumentType?.documentType)}"` : ""}
     ${workforceDocumentType?.holderType ? `holderType: "${workforceDocumentType?.holderType}"` : ""}
@@ -111,6 +112,30 @@ export function createWorkforceDocument(
     [
       "DOCUMENT_MUTATION_REQ",
       "DOCUMENT_CREATE_DOCUMENT_RESP",
+      "DOCUMENT_MUTATION_ERR",
+    ],
+    {
+      clientMutationId: mutation.clientMutationId,
+      clientMutationLabel,
+      requestedDateTime,
+    }
+  );
+}
+export function updateWorkforceDocument(
+  workforceDocumentType,
+  clientMutationLabel
+) {
+  const mutation = formatMutation(
+    "updateWorkforceDocument",
+    formatWorkforceDocumentGQL(workforceDocumentType),
+    clientMutationLabel
+  );
+  const requestedDateTime = new Date();
+  return graphql(
+    mutation.payload,
+    [
+      "DOCUMENT_MUTATION_REQ",
+      "DOCUMENT_UPDATE_DOCUMENT_RESP",
       "DOCUMENT_MUTATION_ERR",
     ],
     {

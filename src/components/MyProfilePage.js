@@ -19,7 +19,9 @@ import {
   ProgressOrError,
   ControlledField,
   SelectInput,
-  encodeId
+  encodeId,
+  parseData,
+  decodeId
 } from "@openimis/fe-core";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -27,9 +29,10 @@ import {
   fetchRoles,
   fetchWorkforceDocument,
   updateUserProfile,
+  updateWorkforceDocument,
 } from "../action.js"; // 👈 add updateUserProfile action
 import SignatureCapture from "./shared/SignatureCapture.js";
-import { safeApplicationId } from "../utils/utils.js";
+import { safeApplicationId, safeDecodeId } from "../utils/utils.js";
 
 const useStyles = makeStyles((theme) => ({
   page: theme.page,
@@ -81,7 +84,11 @@ const MyProfilePage = () => {
 
   useEffect(() => {
     dispatch(fetchRoles());
-    dispatch(fetchWorkforceDocument(modulesManager, [`holderId:"${encodeId(modulesManager, "InteractiveUserGQLType", reduxStateUserInfo?.id)}"`]))
+    dispatch(fetchWorkforceDocument(modulesManager, [`holderId:"${encodeId(modulesManager, "InteractiveUserGQLType", reduxStateUserInfo?.id)}"`])).then((res)=>{
+      const signatureDocument = parseData(res?.payload?.data?.workforceDocuments)
+      console.log({signatureDocument})
+      setSignatureFiles(signatureDocument)
+    })
   }, []);
 
   const handleChange = (name, value) => {
@@ -108,6 +115,19 @@ const MyProfilePage = () => {
       setShowSuccess(false);
     }, 3000);
   };
+
+  const handleSignatureDelete =async (file)=>{
+    const updateDocumentData = {
+        id:decodeId(file?.id),
+        // workforceApplicationId: safeApplicationId(applicationId),
+        isDeleted: true,
+        holderId: reduxStateUserInfo?.id,
+        holderType: "user",
+      };
+
+      console.log("inside from saveprofile", updateDocumentData);
+      dispatch(updateWorkforceDocument(updateDocumentData,`Created workforce document `));
+  }
 
   // console.log("upload from profile", uploadFile);
   console.log("upload from profile", signatureFiles);
@@ -267,6 +287,7 @@ const MyProfilePage = () => {
                 dispatch={dispatch}
                 files={signatureFiles}
                 setFiles={setSignatureFiles}
+                handleDelete={handleSignatureDelete}
               />
             </Grid>
 
