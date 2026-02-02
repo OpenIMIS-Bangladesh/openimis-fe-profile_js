@@ -59,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
     maxHeight: "75vh", // Smaller and nicer on all screens
   },
   cropperContainer: {
-    height: 400,
+    height: 500,
     width: "100%",
     background: "#000",
   },
@@ -241,7 +241,7 @@ const SignatureCapture = ({ files, setFiles,handleDelete }) => {
           <Cropper
             src={image}
             style={{ height: "100%", width: "100%" }}
-            aspectRatio={4 / 1}
+            aspectRatio={NaN}
             guides={true}
             viewMode={1}
             dragMode="move"
