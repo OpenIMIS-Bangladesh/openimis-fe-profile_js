@@ -4,7 +4,9 @@ import {
   dispatchMutationReq,
   dispatchMutationResp,
   dispatchMutationErr,
-  parseData
+  parseData,
+  decodeId,
+  encodeId
 } from "@openimis/fe-core";
 
 export function reducer(
@@ -19,6 +21,12 @@ export function reducer(
     fetchedDocument: false,
     document: [],
     documentPageInfo: { totalCount: 0 },
+
+    fetchingWorkforceEmployee: false,
+    errorWorkforceEmployee: null,
+    fetchedWorkforceEmployee: false,
+    workforceEmployee: null,
+    workforceEmployeePageInfo: { totalCount: 0 },
 
     //update profile states
     updatingProfile: false,
@@ -125,6 +133,26 @@ export function reducer(
         updatedProfile: false,
         errorUpdatingProfile: null,
       };
+    case "WORKFORCE_EMPLOYEE_REQ":
+      return {
+        ...state,
+        fetchingWorkforceEmployee: true,
+        fetchedWorkforceEmployee: false,
+        workforceEmployee: null,
+        errorWorkforceEmployee: null,
+      };
+    case "WORKFORCE_EMPLOYEE_RESP":
+      return {
+        ...state,
+        fetchingWorkforceEmployee: false,
+        fetchedWorkforceEmployee: true,
+        workforceEmployee: parseData(action.payload.data.workforceEmployerEmployees).map((workforceEmployee) => ({
+          ...workforceEmployee,
+          id: decodeId(workforceEmployee.id),
+        }))?.[0],
+        errorWorkforceEmployee: formatGraphQLError(action.payload),
+      };
+
     case "DOCUMENT_MUTATION_REQ": {
       return dispatchMutationReq(state, action);
     }

@@ -30,7 +30,7 @@ import {
   Dashboard,
   Settings,
   ExitToApp,
-  Edit
+  Edit,
 } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -40,11 +40,15 @@ import {
   FormattedMessage,
   ProgressOrError,
   ControlledField,
+  encodeId,
+  parseData
 } from "@openimis/fe-core";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchRoles } from "../action.js";
+import { fetchFactoryEmployee, fetchRoles, fetchWorkforceDocument } from "../action.js";
 import ChangePasswordPage from "./ChangePasswordPage.js";
 import MyProfilePage from "./MyProfilePage.js";
+import { getUserType } from "../utils/utils.js";
+import { WORKFORCE_USER_TYPE } from "../utils/constants.js";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -154,147 +158,287 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.light,
     color: "#004b6eff",
   },
+  signatureContainer: {
+    marginTop: "60px",
+    width: "100%",
+  },
+  signatureBlock: {
+    marginTop: "40px",
+    borderTop: "1px solid #000",
+    paddingTop: "5px",
+    fontSize: "11px",
+    whiteSpace: "pre-line",
+    lineHeight: 1.2,
+    color: "#000",
+  },
 }));
 
 // Sidebar Menu Items
 const SidebarMenu = [
-  { id: "dashboard", text: "menu.dashboard", icon: <Dashboard /> , redirect_url: '' },
-  { id: "profile", text: "menu.myProfile", icon: <AccountBox />, redirect_url: '' },
-  { id: "change_password", text: "menu.changePassword", icon: <Security />, redirect_url: '' },
-  { id: "editProfile", text: "menu.editProfile", icon: <Edit />, redirect_url: '' },
+  {
+    id: "dashboard",
+    text: "menu.dashboard",
+    icon: <Dashboard />,
+    redirect_url: "",
+  },
+  {
+    id: "profile",
+    text: "menu.myProfile",
+    icon: <AccountBox />,
+    redirect_url: "",
+  },
+  {
+    id: "change_password",
+    text: "menu.changePassword",
+    icon: <Security />,
+    redirect_url: "",
+  },
+  {
+    id: "editProfile",
+    text: "menu.editProfile",
+    icon: <Edit />,
+    redirect_url: "",
+  },
   // { id: "logout", text: "core.tooltip.logout", icon: <ExitToApp />, redirect_url: '' },
 ];
 
+const MyProfile = () => {
+  const classes = useStyles();
+  const modulesManager = useModulesManager();
+  const dispatch = useDispatch();
+  const { formatMessage } = useTranslations(
+    "profile.MyProfilePage",
+    modulesManager,
+  );
+  const [workforceFactoryId, setWorkforceFactoryId] = useState(null);
+  const [signatureFiles, setSignatureFiles] = useState([]);
+  const fetchingUser = useSelector((store) => store.profile.fetchingUser);
+  const errorUser = useSelector((store) => store.profile.errorUser);
+  const user = useSelector((store) => store.profile.user);
+  const loggedInUserId = useSelector((state) => state.core?.user?.i_user?.id);
+  const locale = useSelector((state) => state.core?.user?.i_user?.language);
+  const user_type = getUserType()
 
-const MyProfile =() =>{
-    const classes = useStyles();
-    const modulesManager = useModulesManager();
-    const { formatMessage } = useTranslations("profile.MyProfilePage", modulesManager);
+  useEffect(() => {
+    if (loggedInUserId) {
+      const filters = [
+        `relatedUser_Id: "${encodeId(modulesManager, "InteractiveUserGQLType", loggedInUserId)}"`,
+      ];
+      dispatch(fetchFactoryEmployee(modulesManager, filters)).then((res) => {
+        const edges =
+          res?.payload?.data?.workforceEmployerEmployees?.edges || [];
+        const node = edges[0]?.node;
+        const factoryId = node?.workforceFactory || null;
+        setWorkforceFactoryId(factoryId);
+      }).finally(res =>{
+        dispatch(fetchWorkforceDocument(modulesManager, [`holderId:"${encodeId(modulesManager, "InteractiveUserGQLType", loggedInUserId)}"`])).then((res)=>{
+              const signatureDocument = parseData(res?.payload?.data?.workforceDocuments)
+              console.log({signatureDocument})
+              setSignatureFiles(signatureDocument)
+            })
+      })
+    }
+  }, []);
+  console.log({ workforceFactoryId });
+  return (
+    <Box className={classes.mainContent}>
+      <Paper className={classes.profileCard}>
+        <Typography variant="h4" className={classes.sectionTitle}>
+          <Person fontSize="large" />
+          {formatMessage("title")}
+        </Typography>
 
-    const fetchingUser = useSelector((store) => store.profile.fetchingUser);
-    const errorUser = useSelector((store) => store.profile.errorUser);
-    const user = useSelector((store) => store.profile.user);
-    return (
-      <Box className={classes.mainContent}>
-        <Paper className={classes.profileCard}>
-          <Typography variant="h4" className={classes.sectionTitle}>
-            <Person fontSize="large" />
-            {formatMessage("title")}
-          </Typography>
+        <ProgressOrError progress={fetchingUser} error={errorUser} />
 
-          <ProgressOrError progress={fetchingUser} error={errorUser} />
-
-          {/* User Info Grid */}
-          <Grid container spacing={3} className={classes.infoGrid}>
-            <Grid item xs={12} md={6}>
-              <div className={classes.infoItem}>
-                <Person color="primary" />
-                <Box>
-                  <Typography className={classes.infoLabel}> {formatMessage("profile.userName")}</Typography>
-                  <Typography variant="h6">{user?.username || "-"}</Typography>
-                </Box>
-              </div>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <div className={classes.infoItem}>
-                <Email color="primary" />
-                <Box>
-                  <Typography className={classes.infoLabel}> {formatMessage("profile.email")}</Typography>
-                  <Typography variant="h6">{user?.email || "-"}</Typography>
-                </Box>
-              </div>
-            </Grid>
-
-            <Grid item xs={12} md={3}>
-              <div className={classes.infoItem}>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <AccountBox color="primary" />
-                </Box>
-                <Box>
-                  <Typography className={classes.infoLabel}>{formatMessage("profile.otherNames")}</Typography>
-                  <Typography variant="h6">
-                    {user?.otherNames}
-                  </Typography>
-                </Box>
-              </div>
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <div className={classes.infoItem}>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <AccountBox color="primary" />
-                </Box>
-                <Box>
-                  <Typography className={classes.infoLabel}>{formatMessage("profile.lastName")}</Typography>
-                  <Typography variant="h6">
-                    {user?.lastName}
-                  </Typography>
-                </Box>
-              </div>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <div className={classes.infoItem}>
-                <Phone color="primary" />
-                <Box>
-                  <Typography className={classes.infoLabel}>{formatMessage("profile.phone")}</Typography>
-                  <Typography variant="h6">{user?.phone || "-"}</Typography>
-                </Box>
-              </div>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <div className={classes.infoItem}>
-                <Language color="primary" />
-                <Box>
-                  <Typography className={classes.infoLabel}>{formatMessage("profile.language")}</Typography>
-                  <Typography variant="h6">
-                    {user?.iUser?.language?.name || "Not set"}
-                  </Typography>
-                </Box>
-              </div>
-            </Grid>
+        {/* User Info Grid */}
+        <Grid container spacing={3} className={classes.infoGrid}>
+          <Grid item xs={12} md={6}>
+            <div className={classes.infoItem}>
+              <Person color="primary" />
+              <Box>
+                <Typography className={classes.infoLabel}>
+                  {" "}
+                  {formatMessage("profile.userName")}
+                </Typography>
+                <Typography variant="h6">{user?.username || "-"}</Typography>
+              </Box>
+            </div>
           </Grid>
 
-          {/* Roles, Regions, Districts */}
-          <Grid container spacing={4}>
-            {/* Roles */}
-            <Grid item xs={12} md={12}>
-              <Typography variant="h6" className={classes.sectionTitle}>
-                <Security /> {formatMessage("profile.roles")}
-              </Typography>
-              <TableContainer className={classes.tableContainer}>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow className={classes.tableHeader}>
-                      <TableCell>{formatMessage("profile.role")}</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {user?.iUser?.roles?.length ? (
-                      user?.iUser?.roles.map((role) => (
-                        <TableRow key={role.name}>
-                          <TableCell>
-                            <Chip label={role.name} className={classes.chip} size="small" />
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell align="center" colSpan={1}>
-                          <em>No roles assigned</em>
+          <Grid item xs={12} md={6}>
+            <div className={classes.infoItem}>
+              <Email color="primary" />
+              <Box>
+                <Typography className={classes.infoLabel}>
+                  {" "}
+                  {formatMessage("profile.email")}
+                </Typography>
+                <Typography variant="h6">{user?.email || "-"}</Typography>
+              </Box>
+            </div>
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <div className={classes.infoItem}>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <AccountBox color="primary" />
+              </Box>
+              <Box>
+                <Typography className={classes.infoLabel}>
+                  {formatMessage("profile.otherNames")}
+                </Typography>
+                <Typography variant="h6">{user?.otherNames}</Typography>
+              </Box>
+            </div>
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <div className={classes.infoItem}>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <AccountBox color="primary" />
+              </Box>
+              <Box>
+                <Typography className={classes.infoLabel}>
+                  {formatMessage("profile.lastName")}
+                </Typography>
+                <Typography variant="h6">{user?.lastName}</Typography>
+              </Box>
+            </div>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <div className={classes.infoItem}>
+              <Phone color="primary" />
+              <Box>
+                <Typography className={classes.infoLabel}>
+                  {formatMessage("profile.phone")}
+                </Typography>
+                <Typography variant="h6">{user?.phone || "-"}</Typography>
+              </Box>
+            </div>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <div className={classes.infoItem}>
+              <Language color="primary" />
+              <Box>
+                <Typography className={classes.infoLabel}>
+                  {formatMessage("profile.language")}
+                </Typography>
+                <Typography variant="h6">
+                  {user?.iUser?.language?.name || "Not set"}
+                </Typography>
+              </Box>
+            </div>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <div className={classes.infoItem}>
+              <AccountBox color="primary" />
+              {user_type === WORKFORCE_USER_TYPE.FACTORY_ADMIN && (
+              <Box>
+                <Typography className={classes.infoLabel}>
+                  {formatMessage("profile.institutionName")}
+                </Typography>
+                <Typography variant="h6">
+                  {locale === "en"
+                    ? workforceFactoryId?.nameEn
+                    : workforceFactoryId?.nameBn}
+                </Typography>
+              </Box>
+              )}
+              {user_type === WORKFORCE_USER_TYPE.ASSOCIATION && (
+              <Box>
+                <Typography className={classes.infoLabel}>
+                  {formatMessage("profile.institutionName")}
+                </Typography>
+                <Typography variant="h6">
+                  {locale === "en"
+                    ? workforceFactoryId?.allAssociation?.nameEn
+                    : workforceFactoryId?.allAssociation?.nameBn}
+                </Typography>
+              </Box>
+              )}
+            </div>
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={2} className={classes.signatureContainer}>
+          {signatureFiles
+            // ?.filter((sig) =>
+            //   ["eis committee", "eis association committee"].includes(
+            //     sig?.role?.name?.toLowerCase(),
+            //   ),
+            // )
+            .map((sig, i) => (
+              <Grid item xs={3} key={i}>
+                {sig?.url ? (
+                  <img
+                    src={sig.url}
+                    alt="signature"
+                    style={{
+                      width: "100%",
+                      maxHeight: 80,
+                      objectFit: "contain",
+                    }}
+                  />
+                ) : (
+                  <Typography
+                    variant="caption"
+                    style={{ fontStyle: "italic", color: "#999" }}
+                  >
+                    Signature not available
+                  </Typography>
+                )}
+
+                <div className={classes.signatureBlock}>
+                  <p>Signature</p>
+                </div>
+              </Grid>
+            ))}
+        </Grid>
+
+        {/* Roles, Regions, Districts */}
+        <Grid container spacing={4}>
+          {/* Roles */}
+          <Grid item xs={12} md={12}>
+            <Typography variant="h6" className={classes.sectionTitle}>
+              <Security /> {formatMessage("profile.roles")}
+            </Typography>
+            <TableContainer className={classes.tableContainer}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow className={classes.tableHeader}>
+                    <TableCell>{formatMessage("profile.role")}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {user?.iUser?.roles?.length ? (
+                    user?.iUser?.roles.map((role) => (
+                      <TableRow key={role.name}>
+                        <TableCell>
+                          <Chip
+                            label={role.name}
+                            className={classes.chip}
+                            size="small"
+                          />
                         </TableCell>
                       </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Grid>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell align="center" colSpan={1}>
+                        <em>No roles assigned</em>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Grid>
-        </Paper>
-      </Box>
-    );
-}
+        </Grid>
+      </Paper>
+    </Box>
+  );
+};
 
 const MyProfileViewPage = () => {
   const classes = useStyles();
@@ -326,11 +470,10 @@ const MyProfileViewPage = () => {
     dispatch(fetchRoles());
   }, [dispatch]);
 
-
   const renderContent = () => {
     switch (selectedMenu) {
       case "dashboard":
-        window.location.href = '/';
+        window.location.href = "/";
         return;
       case "editProfile":
         return <MyProfilePage />;
@@ -361,7 +504,12 @@ const MyProfileViewPage = () => {
             )} */}
           </Box>
 
-          <Divider style={{ backgroundColor: "rgba(255,255,255,0.2)", margin: "16px 0" }} />
+          <Divider
+            style={{
+              backgroundColor: "rgba(255,255,255,0.2)",
+              margin: "16px 0",
+            }}
+          />
 
           <List>
             {SidebarMenu.map((item) => (
@@ -377,7 +525,9 @@ const MyProfileViewPage = () => {
                 </ListItemIcon>
                 {sidebarOpen && (
                   <ListItemText
-                    primary={<FormattedMessage module="profile" id={item.text} />}
+                    primary={
+                      <FormattedMessage module="profile" id={item.text} />
+                    }
                     className={classes.listItemText}
                   />
                 )}
@@ -389,7 +539,6 @@ const MyProfileViewPage = () => {
 
       {/* Main Content */}
       {renderContent()}
-      
     </Box>
   );
 };

@@ -24,6 +24,7 @@
   "profile.fullname": "পূর্ণ নাম",
   "profile.saveProfile": "তথ্য সংরক্ষণ করুন",
   "profile.updated.successfully": "তথ্য সফলভাবে আপডেট হয়েছে",
-  "workforce.profile.uploadSignature":"স্বাক্ষর আপলোড করুন"
+  "workforce.profile.uploadSignature":"স্বাক্ষর আপলোড করুন",
+  "profile.institutionName":"কর্মরত প্রতিষ্ঠান"
 
 }

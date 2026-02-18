@@ -24,5 +24,7 @@
   "profile.fullname": "Full Name",
   "profile.saveProfile": "Save Information",
   "profile.updated.successfully": "Information updated successfully",
-  "workforce.profile.uploadSignature":"Upload Signature"
+  "workforce.profile.uploadSignature":"Upload Signature",
+  "profile.institutionName":"Current Institution"
+
 }

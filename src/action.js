@@ -168,6 +168,20 @@ export function fetchWorkforceDocument(mm, filters) {
   return graphql(payload, "WORKFORCE_DOCUMENT");
 }
 
+export function fetchFactoryEmployee(mm, filters) {
+  const projections = [
+    "id",
+    "employeeDesignationEmployeeId{edges{node{id,workforceFactory{id}}}}",
+    "workforceFactory{id, nameBn, nameEn,membershipNo,registrationDate,registrationExpiryDate,allAssociation{id,nameBn,nameEn,startDate}}",
+    "relatedUser{id}"
+  ];
+  const payload = formatPageQueryWithCount(
+    "workforceEmployerEmployees",
+    filters,
+    projections
+  );
+  return graphql(payload, "WORKFORCE_EMPLOYEE");
+}
 
 export const setUploadedFiles = (fieldKey, files) => ({
   type: "SET_UPLOADED_FILES",
