@@ -21,7 +21,7 @@ import {
   SelectInput,
   encodeId,
   parseData,
-  decodeId
+  decodeId,
 } from "@openimis/fe-core";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -33,6 +33,7 @@ import {
 } from "../action.js"; // 👈 add updateUserProfile action
 import SignatureCapture from "./shared/SignatureCapture.js";
 import { safeApplicationId, safeDecodeId } from "../utils/utils.js";
+import FileUploader from "./shared/FileUploader.js";
 
 const useStyles = makeStyles((theme) => ({
   page: theme.page,
@@ -48,7 +49,7 @@ const MyProfilePage = () => {
   const modulesManager = useModulesManager();
   const { formatMessage } = useTranslations(
     "profile.MyProfilePage",
-    modulesManager
+    modulesManager,
   );
 
   const dispatch = useDispatch();
@@ -58,6 +59,7 @@ const MyProfilePage = () => {
   const reduxStateUserInfo = useSelector((state) => state.core.user.i_user);
   const [showSuccess, setShowSuccess] = useState(false);
   const [signatureFiles, setSignatureFiles] = useState([]);
+  const [myPhotoBase64, setMyPhotoBase64] = useState("");
 
   const [formData, setFormData] = useState({
     userName: "",
@@ -84,11 +86,17 @@ const MyProfilePage = () => {
 
   useEffect(() => {
     dispatch(fetchRoles());
-    dispatch(fetchWorkforceDocument(modulesManager, [`holderId:"${encodeId(modulesManager, "InteractiveUserGQLType", reduxStateUserInfo?.id)}"`])).then((res)=>{
-      const signatureDocument = parseData(res?.payload?.data?.workforceDocuments)
-      console.log({signatureDocument})
-      setSignatureFiles(signatureDocument)
-    })
+    dispatch(
+      fetchWorkforceDocument(modulesManager, [
+        `holderId:"${encodeId(modulesManager, "InteractiveUserGQLType", reduxStateUserInfo?.id)}"`,
+      ]),
+    ).then((res) => {
+      const signatureDocument = parseData(
+        res?.payload?.data?.workforceDocuments,
+      );
+      console.log({ signatureDocument });
+      setSignatureFiles(signatureDocument);
+    });
   }, []);
 
   const handleChange = (name, value) => {
@@ -97,18 +105,23 @@ const MyProfilePage = () => {
 
   const saveProfile = async () => {
     dispatch(updateUserProfile(formData));
-    
+
     const createDocumentData = {
-        path: signatureFiles?.[0]?.uploadInfo?.file_path,
-        url: signatureFiles?.[0]?.uploadInfo?.file_url,
-        // workforceApplicationId: safeApplicationId(applicationId),
-        documentType: "signature",
-        holder: "57",
-        holderId: reduxStateUserInfo?.id,
-        holderType: "user",
-      };
-      console.log("inside from saveprofile", createDocumentData);
-      dispatch(createWorkforceDocument(createDocumentData,`Created workforce document `));
+      path: signatureFiles?.[0]?.uploadInfo?.file_path,
+      url: signatureFiles?.[0]?.uploadInfo?.file_url,
+      // workforceApplicationId: safeApplicationId(applicationId),
+      documentType: "signature",
+      holder: "57",
+      holderId: reduxStateUserInfo?.id,
+      holderType: "user",
+    };
+    console.log("inside from saveprofile", createDocumentData);
+    dispatch(
+      createWorkforceDocument(
+        createDocumentData,
+        `Created workforce document `,
+      ),
+    );
     setShowSuccess(true);
 
     setTimeout(() => {
@@ -116,18 +129,28 @@ const MyProfilePage = () => {
     }, 3000);
   };
 
-  const handleSignatureDelete =async (file)=>{
+  const handleSignatureDelete = async (file) => {
     const updateDocumentData = {
-        id:decodeId(file?.id),
-        // workforceApplicationId: safeApplicationId(applicationId),
-        isDeleted: true,
-        holderId: reduxStateUserInfo?.id,
-        holderType: "user",
-      };
+      id: decodeId(file?.id),
+      // workforceApplicationId: safeApplicationId(applicationId),
+      isDeleted: true,
+      holderId: reduxStateUserInfo?.id,
+      holderType: "user",
+    };
 
-      console.log("inside from saveprofile", updateDocumentData);
-      dispatch(updateWorkforceDocument(updateDocumentData,`Created workforce document `));
-  }
+    console.log("inside from saveprofile", updateDocumentData);
+    dispatch(
+      updateWorkforceDocument(
+        updateDocumentData,
+        `Created workforce document `,
+      ),
+    );
+  };
+
+  const handlePhotoUpdate = (base64String, fileName) => {
+    setMyPhotoBase64(base64String);
+    console.log("Ready to submit Base64:", base64String);
+  };
 
   // console.log("upload from profile", uploadFile);
   console.log("upload from profile", signatureFiles);
@@ -243,6 +266,10 @@ const MyProfilePage = () => {
                 </Grid>
               }
             />
+            <Grid item xs={4}>
+              <Typography><FormattedMessage id="profile.picture" /></Typography>
+            <FileUploader onFileChange={handlePhotoUpdate}/>
+            </Grid>
 
             {/* <Grid item xs={4}>
               <FormControl fullWidth>
@@ -294,6 +321,9 @@ const MyProfilePage = () => {
             <Grid item xs={12}>
               <Button variant="contained" color="primary" onClick={saveProfile}>
                 <FormattedMessage module="profile" id="saveProfile" />
+              </Button>
+              <Button variant="contained" color="primary" onClick={saveProfile} style={{marginLeft:2}}>
+                <FormattedMessage module="profile" id="verifyProfile" />
               </Button>
             </Grid>
 

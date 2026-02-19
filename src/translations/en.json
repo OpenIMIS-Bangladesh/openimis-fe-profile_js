@@ -23,8 +23,10 @@
   "profile.language": "Interface Language",
   "profile.fullname": "Full Name",
   "profile.saveProfile": "Save Information",
+  "profile.verifyProfile": "Verify Profile",
   "profile.updated.successfully": "Information updated successfully",
   "workforce.profile.uploadSignature":"Upload Signature",
-  "profile.institutionName":"Current Institution"
-
+  "profile.institutionName":"Current Institution",
+  "profile.picture":"Profile Picture"
+ 
 }

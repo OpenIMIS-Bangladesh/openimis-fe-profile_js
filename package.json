@@ -46,6 +46,7 @@
     "cropperjs": "^2.1.0",
     "react-cropper": "^2.3.3",
     "react-dropzone": "^14.3.5",
-    "react-window": "^1.8.8"
+    "react-window": "^1.8.8",
+    "react-webcam": "^7.2.0"
   }
 }
