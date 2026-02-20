@@ -1,5 +1,6 @@
 {
   "profile.mainMenu": "Profile",
+  "profile.menu.beneficiary.verification": "Beneficiary Verification",
   "profile.menu.changePassword": "Change Password",
   "profile.ChangePasswordPage.title": "Change Password",
   "profile.ChangePasswordPage.notEqualError": "The passwords are not the same",

@@ -1,5 +1,6 @@
 {
   "profile.mainMenu": "প্রোফাইল",
+  "profile.menu.beneficiary.verification": "সুবিধাভোগী যাচাইকরণ",
   "profile.menu.changePassword": "পাসওয়ার্ড পরিবর্তন করুন",
   "profile.ChangePasswordPage.title": "পাসওয়ার্ড পরিবর্তন",
   "profile.ChangePasswordPage.notEqualError": "পাসওয়ার্ড একই নয়",

@@ -266,10 +266,10 @@ const MyProfilePage = () => {
                 </Grid>
               }
             />
-            <Grid item xs={4}>
+            {/* <Grid item xs={4}>
               <Typography><FormattedMessage id="profile.picture" /></Typography>
             <FileUploader onFileChange={handlePhotoUpdate}/>
-            </Grid>
+            </Grid> */}
 
             {/* <Grid item xs={4}>
               <FormControl fullWidth>
@@ -322,9 +322,9 @@ const MyProfilePage = () => {
               <Button variant="contained" color="primary" onClick={saveProfile}>
                 <FormattedMessage module="profile" id="saveProfile" />
               </Button>
-              <Button variant="contained" color="primary" onClick={saveProfile} style={{marginLeft:2}}>
+              {/* <Button variant="contained" color="secondary" onClick={() => window.open("https://demo-liveverification.skydigitalbd.com/liveliness", "_blank", "noopener,noreferrer")} style={{marginLeft:4}}>
                 <FormattedMessage module="profile" id="verifyProfile" />
-              </Button>
+              </Button> */}
             </Grid>
 
             {/* <Grid item xs={4}>
