@@ -168,6 +168,20 @@ export function fetchWorkforceDocument(mm, filters) {
   return graphql(payload, "WORKFORCE_DOCUMENT");
 }
 
+export function fetchWorkforceAssociationUserMaps(filters) {
+  const projections = [
+    "id",
+    "allAssociation {id,nameEn,nameBn, shortNameEn, shortNameBn}",
+    "user {id,loginName}",
+  ];
+  const payload = formatPageQueryWithCount(
+    "workforceAssociationUserMap",
+    filters,
+    projections
+  );
+  return graphql(payload, "WORKFORCE_ASSOCIATION_USER_MAPS");
+}
+
 export function fetchFactoryEmployee(mm, filters) {
   const projections = [
     "id",

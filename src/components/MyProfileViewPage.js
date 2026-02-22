@@ -44,7 +44,7 @@ import {
   parseData
 } from "@openimis/fe-core";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchFactoryEmployee, fetchRoles, fetchWorkforceDocument } from "../action.js";
+import { fetchFactoryEmployee, fetchRoles, fetchWorkforceAssociationUserMaps, fetchWorkforceDocument } from "../action.js";
 import ChangePasswordPage from "./ChangePasswordPage.js";
 import MyProfilePage from "./MyProfilePage.js";
 import { getUserType } from "../utils/utils.js";
@@ -211,6 +211,7 @@ const MyProfile = () => {
     modulesManager,
   );
   const [workforceFactoryId, setWorkforceFactoryId] = useState(null);
+  const [workforceAssociationId, setWorkforceAssociationId] = useState([]);
   const [signatureFiles, setSignatureFiles] = useState([]);
   const fetchingUser = useSelector((store) => store.profile.fetchingUser);
   const errorUser = useSelector((store) => store.profile.errorUser);
@@ -231,6 +232,11 @@ const MyProfile = () => {
         const factoryId = node?.workforceFactory || null;
         setWorkforceFactoryId(factoryId);
       }).finally(res =>{
+        dispatch(fetchWorkforceAssociationUserMaps([`userId: ${loggedInUserId}`])).then(res=>{
+          const responseData = parseData(res?.payload?.data?.workforceAssociationUserMap)
+          setWorkforceAssociationId(responseData)
+          console.log("from association",responseData)
+        })
         dispatch(fetchWorkforceDocument(modulesManager, [`holderId:"${encodeId(modulesManager, "InteractiveUserGQLType", loggedInUserId)}"`])).then((res)=>{
               const signatureDocument = parseData(res?.payload?.data?.workforceDocuments)
               console.log({signatureDocument})
@@ -239,7 +245,7 @@ const MyProfile = () => {
       })
     }
   }, []);
-  console.log({ workforceFactoryId });
+  console.log(user_type === WORKFORCE_USER_TYPE.ASSOCIATION);
   return (
     <Box className={classes.mainContent}>
       <Paper className={classes.profileCard}>
@@ -352,8 +358,8 @@ const MyProfile = () => {
                 </Typography>
                 <Typography variant="h6">
                   {locale === "en"
-                    ? workforceFactoryId?.allAssociation?.nameEn
-                    : workforceFactoryId?.allAssociation?.nameBn}
+                    ? workforceAssociationId?.[0]?.allAssociation?.nameEn
+                    : workforceAssociationId?.[0]?.allAssociation?.nameBn}
                 </Typography>
               </Box>
               )}
