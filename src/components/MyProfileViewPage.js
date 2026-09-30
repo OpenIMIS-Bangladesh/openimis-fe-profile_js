@@ -449,6 +449,7 @@ const MyProfile = () => {
 const MyProfileViewPage = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const user_type = getUserType()
 
   const [selectedMenu, setSelectedMenu] = useState("myProfile");
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -518,7 +519,7 @@ const MyProfileViewPage = () => {
           />
 
           <List>
-            {SidebarMenu.map((item) => (
+            {SidebarMenu.filter(item =>user_type === WORKFORCE_USER_TYPE.APPLICANT? item.id !== 'change_password' : true).map((item) => (
               <ListItem
                 button
                 key={item.id}

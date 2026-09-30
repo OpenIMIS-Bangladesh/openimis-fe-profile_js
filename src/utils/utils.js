@@ -13,6 +13,10 @@ export const safeApplicationId = (applicationId, parsedApplicationData) => {
   }
 };
 
+export function isEmptyObject(obj) {
+  return Object.keys(obj).length === 0;
+}
+
 export function getUserType() {
   const reduxState = useSelector((state) => state);
   const user_rights = reduxState.core.user.i_user.rights;

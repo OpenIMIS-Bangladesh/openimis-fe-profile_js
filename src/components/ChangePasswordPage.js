@@ -8,6 +8,8 @@ import {
   TextInput,
   useAuthentication,
 } from "@openimis/fe-core";
+import { getUserType } from "../utils/utils";
+import { WORKFORCE_USER_TYPE } from "../utils/constants";
 
 const useStyles = makeStyles((theme) => ({
   page: theme.page,
@@ -17,6 +19,7 @@ const useStyles = makeStyles((theme) => ({
 
 const ChangePasswordPage = (props) => {
   const classes = useStyles();
+  const user_type = getUserType()
   const modulesManager = useModulesManager();
   const { formatMessage } = useTranslations("profile.ChangePasswordPage", modulesManager);
   const [formValues, setFormValues] = useState({});
@@ -66,7 +69,7 @@ const ChangePasswordPage = (props) => {
                 <TextInput
                   module="profile"
                   required
-                  readOnly={isLoading}
+                  readOnly={isLoading|| user_type === WORKFORCE_USER_TYPE.APPLICANT}
                   type="password"
                   label={"ChangePasswordPage.oldPasswordLabel"}
                   onChange={(oldPassword) => setFormValues({ ...formValues, oldPassword })}
@@ -76,7 +79,7 @@ const ChangePasswordPage = (props) => {
                 <TextInput
                   module="profile"
                   required
-                  readOnly={isLoading}
+                  readOnly={isLoading|| user_type === WORKFORCE_USER_TYPE.APPLICANT}
                   type="password"
                   label={"ChangePasswordPage.newPasswordLabel"}
                   onChange={(password) => setFormValues({ ...formValues, password })}
@@ -85,7 +88,7 @@ const ChangePasswordPage = (props) => {
               <Grid xs={12} item>
                 <TextInput
                   module="profile"
-                  readOnly={isLoading}
+                  readOnly={isLoading|| user_type === WORKFORCE_USER_TYPE.APPLICANT}
                   required
                   type="password"
                   label={"ChangePasswordPage.confirmPasswordLabel"}
