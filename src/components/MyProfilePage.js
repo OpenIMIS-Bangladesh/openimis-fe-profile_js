@@ -106,22 +106,26 @@ const MyProfilePage = () => {
   const saveProfile = async () => {
     dispatch(updateUserProfile(formData));
 
-    const createDocumentData = {
-      path: signatureFiles?.[0]?.uploadInfo?.file_path,
-      url: signatureFiles?.[0]?.uploadInfo?.file_url,
-      // workforceApplicationId: safeApplicationId(applicationId),
-      documentType: "signature",
-      holder: "57",
-      holderId: reduxStateUserInfo?.id,
-      holderType: "user",
-    };
-    console.log("inside from saveprofile", createDocumentData);
-    dispatch(
-      createWorkforceDocument(
-        createDocumentData,
-        `Created workforce document `,
-      ),
-    );
+    const file = signatureFiles[0];
+    const uploadInfo = file?.uploadInfo;
+
+    // Don't create/update a document when no new signature was uploaded.
+    if (uploadInfo) {
+      const documentData = {
+        ...(file.id ? { id: decodeId(file.id) } : {}),
+        path: uploadInfo.file_path,
+        url: uploadInfo.file_url,
+        documentType: "signature",
+        holderId: reduxStateUserInfo?.id,
+        holderType: "user",
+      };
+
+      if (file.id) {
+        dispatch(updateWorkforceDocument(documentData, "Updated signature"));
+      } else {
+        dispatch(createWorkforceDocument(documentData, "Created signature"));
+      }
+    }
     setShowSuccess(true);
 
     setTimeout(() => {
@@ -288,7 +292,7 @@ const MyProfilePage = () => {
                   </Select>
               </FormControl>
             </Grid> */}
-            {/* 
+            {/*
             <ControlledField
               module="profile"
               id="language"

@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SignatureCapture = ({ files, setFiles,handleDelete }) => {
+const SignatureCapture = ({ files, setFiles, handleDelete }) => {
   const classes = useStyles();
   const [image, setImage] = useState(null);
   const [showCropper, setShowCropper] = useState(false);
@@ -76,7 +76,7 @@ const SignatureCapture = ({ files, setFiles,handleDelete }) => {
 
   // Load Cropper CSS
   useEffect(() => {
-    setFiles([...fetchedSignature])
+    setFiles([...fetchedSignature]);
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.href = "https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.css";
@@ -86,7 +86,7 @@ const SignatureCapture = ({ files, setFiles,handleDelete }) => {
     };
   }, []);
 
-  console.log({fetchedSignature})
+  console.log({ fetchedSignature });
 
   const uploadFileToApi = async (file) => {
     const formData = new FormData();
@@ -111,6 +111,7 @@ const SignatureCapture = ({ files, setFiles,handleDelete }) => {
         uploadInfo: responseData,
         name: file.name,
         url: responseData.file_url || URL.createObjectURL(file),
+        id: files[0]?.id,
       };
 
       setFiles([fileWithInfo]); // Replace old signature
@@ -166,11 +167,11 @@ const SignatureCapture = ({ files, setFiles,handleDelete }) => {
 
   const handleRemove = (file) => {
     setFiles([]);
-    handleDelete(file)
-  }
+    handleDelete(file);
+  };
   const handleView = (file) => window.open(file.url, "_blank");
 
-  console.log(files)
+  console.log(files);
 
   return (
     <>
@@ -184,7 +185,11 @@ const SignatureCapture = ({ files, setFiles,handleDelete }) => {
           onClick={() => fileInputRef.current?.click()}
         >
           <CloudUploadIcon className={classes.uploadIcon} />
-          <Typography variant="body1" color="primary" style={{ marginLeft: 12 }}>
+          <Typography
+            variant="body1"
+            color="primary"
+            style={{ marginLeft: 12 }}
+          >
             <FormattedMessage
               module="profile"
               id="workforce.profile.uploadSignature"
@@ -202,7 +207,7 @@ const SignatureCapture = ({ files, setFiles,handleDelete }) => {
       </Paper>
 
       {/* Uploaded Signature */}
-      {files.length > 0&& files[0] != null && (
+      {files.length > 0 && files[0] != null && (
         <Paper className={classes.fileList} elevation={1}>
           {files.map((file, i) => (
             <Box key={i} className={classes.fileItem}>
@@ -211,9 +216,9 @@ const SignatureCapture = ({ files, setFiles,handleDelete }) => {
                 className={classes.fileName}
                 onClick={() => handleView(file)}
               >
-                {file.name ||"Signature.png"}
+                {file.name || "Signature.png"}
               </Typography>
-              <IconButton size="small" onClick={()=>handleRemove(file)}>
+              <IconButton size="small" onClick={() => handleRemove(file)}>
                 <DeleteIcon className={classes.deleteIcon} />
               </IconButton>
             </Box>
@@ -229,7 +234,11 @@ const SignatureCapture = ({ files, setFiles,handleDelete }) => {
         classes={{ paper: classes.dialogPaper }}
       >
         <DialogTitle>
-          <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
             <Typography variant="h6">Crop Your Signature</Typography>
             <IconButton size="small" onClick={handleCloseCropper}>
               <CloseIcon />
@@ -256,9 +265,7 @@ const SignatureCapture = ({ files, setFiles,handleDelete }) => {
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={handleCloseCropper}>
-            Cancel
-          </Button>
+          <Button onClick={handleCloseCropper}>Cancel</Button>
           <Button
             onClick={handleCropAndUpload}
             disabled={isUploading}
